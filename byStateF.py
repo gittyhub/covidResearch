@@ -5,7 +5,7 @@ import os
 
 
 '''This Programs will download current state data on Covid19 and graph it for you'''
-#------------Stat_Data_From_Github------------- 
+#------------State_Data_From_Github------------- 
 def get_data_State():
   site = 'https://covidtracking.com/api/v1/states/daily.csv'
   df =  pd.DataFrame(pd.read_csv(site, error_bad_lines=False))
@@ -44,17 +44,17 @@ def plot_data(df,*args):
   plt.show()
 
     
-def plot_top_S(df,s,d='death'):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.plot_top_S(byStateF.check_state_data(),5,"death"))'
+def plot_top_S(df,top=5,d='death'):
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.plot_top_S(byStateF.check_state_data(),5,"deathIncrease"))'
   df.sort_values('date', ascending=False)                              #sort df in decending order
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of most recent date
   rec_sorted = latest_record.sort_values(d, ascending=False)           #sort all death, cummulative death
-  top_10_State = list(rec_sorted['state'][0:s])                        #get top S states with most death in list
+  top_10_State = list(rec_sorted['state'][0:top])                        #get top S states with most death in list
   total_state = df[df.state.isin(top_10_State)]                        #filter df on stop S state
   return total_state
 
-def data_top_S_week(df,top=5,cat='death', days=7):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.data_top_S_week(byStateF.check_state_data(),5,"death",7))'
+def data_top_S_day(df,top=5,cat='death', days=7):
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.data_top_S_week(byStateF.check_state_data(),5,"deathIncrease",7))'
   df.sort_values('date', ascending=False)                              #sort df in decending order
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of most recent date
   rec_sorted = latest_record.sort_values(cat, ascending=False)           #sort all death, cummulative death
@@ -64,14 +64,22 @@ def data_top_S_week(df,top=5,cat='death', days=7):
   return total_state
 
 
-def show_top_10(df,s,d='death'):
+def show_top_S(df,top=5,d='death'):
   #python3 -c 'import byStateF; print(byStateF.show_top_10(byStateF.check_state_data(),5, "deathIncrease"))'
   df.sort_values('date', ascending=False)
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of the latest time period, one date
   rec_sorted = latest_record.sort_values(d, ascending=False)     #sort all death on that one day this is a cummulative death
-  top_10_State = list(rec_sorted['state'][0:s])                        #get top states with most death
+  top_10_State = list(rec_sorted['state'][0:top])                        #get top states with most death
   total_state = rec_sorted[rec_sorted.state.isin(top_10_State)]
   return total_state
+
+def get_states_in_list(df,l=['CA'],days=7):
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.get_states_in_list(byStateF.check_state_data(),["FL","CO","MI", "GA"],7))'
+  past_seven_days = df['date'].unique()[0:days]
+  df = df[df.date.isin(past_seven_days) & df.state.isin(l)]
+  return df
+
+
 
 if __name__ == "__main__":
 
