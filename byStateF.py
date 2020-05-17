@@ -13,7 +13,11 @@ def get_data_State():
 
 #code to check the timestamp of the csv file if more than one day old then execute the github function above 
 def check_state_data():
-  get_file_last_edit = datetime.date.fromtimestamp(os.stat('/home/bot/Documents/daily.csv').st_mtime)
+  try:
+    get_file_last_edit = datetime.date.fromtimestamp(os.stat('/home/bot/Documents/daily.csv').st_mtime)
+  except FileNotFoundError:
+    get_file_last_edit = get_data_State()
+    get_file_last_edit = datetime.date.fromtimestamp(os.stat('/home/bot/Documents/daily.csv').st_mtime)
   get_today_date = datetime.date.today()
   if get_today_date > get_file_last_edit:
     get_data_State()
@@ -21,7 +25,7 @@ def check_state_data():
   else:
     print('Data Up to Date.')
   df =  pd.DataFrame(pd.read_csv('/home/bot/Documents/daily.csv'))
-  df_State = df[['date','state','death','hospitalized', 'deathIncrease']]
+  df_State = df[['date','state','positive','death','hospitalized', 'deathIncrease']]
   df_State['date'] = pd.to_datetime(df_State['date'], format='%Y%m%d')
   df_State.fillna(0,inplace=True)
   return df_State
@@ -44,7 +48,7 @@ def plot_data(df,*args):
   plt.show()
 
     
-def plot_top_S(df,top=5,d='death'):
+def plot_all_data_top_S(df,top=5,d='death'):
   #python3 -c 'import byStateF; byStateF.plot_data(byStateF.plot_top_S(byStateF.check_state_data(),5,"deathIncrease"))'
   df.sort_values('date', ascending=False)                              #sort df in decending order
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of most recent date
@@ -54,7 +58,7 @@ def plot_top_S(df,top=5,d='death'):
   return total_state
 
 def data_top_S_day(df,top=5,cat='death', days=7):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.data_top_S_week(byStateF.check_state_data(),5,"deathIncrease",7))'
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.data_top_S_day(byStateF.check_state_data(),5,"deathIncrease",7))'
   df.sort_values('date', ascending=False)                              #sort df in decending order
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of most recent date
   rec_sorted = latest_record.sort_values(cat, ascending=False)           #sort all death, cummulative death
@@ -65,7 +69,7 @@ def data_top_S_day(df,top=5,cat='death', days=7):
 
 
 def show_top_S(df,top=5,d='death'):
-  #python3 -c 'import byStateF; print(byStateF.show_top_10(byStateF.check_state_data(),5, "deathIncrease"))'
+  #python3 -c 'import byStateF; print(byStateF.show_top_S(byStateF.check_state_data(),5, "deathIncrease"))'
   df.sort_values('date', ascending=False)
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of the latest time period, one date
   rec_sorted = latest_record.sort_values(d, ascending=False)     #sort all death on that one day this is a cummulative death
@@ -74,7 +78,7 @@ def show_top_S(df,top=5,d='death'):
   return total_state
 
 def get_states_in_list(df,l=['CA'],days=7):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.get_states_in_list(byStateF.check_state_data(),["FL","CO","MI", "GA"],7))'
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.get_states_in_list(byStateF.check_state_data(),["FL","CO","MI", "GA"],14))'
   past_seven_days = df['date'].unique()[0:days]
   df = df[df.date.isin(past_seven_days) & df.state.isin(l)]
   return df
