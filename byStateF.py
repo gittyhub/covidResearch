@@ -25,18 +25,12 @@ def check_state_data():
   else:
     print('Data Up to Date.')
   df =  pd.DataFrame(pd.read_csv('/home/bot/Documents/daily.csv'))
-  df_State = df[['date','state','positive','death','hospitalized', 'deathIncrease']]
+  df_State = df[['date','state','positive','death','hospitalized', 'deathIncrease', 'hospitalizedIncrease', 'positiveIncrease']]
   df_State['date'] = pd.to_datetime(df_State['date'], format='%Y%m%d')
   df_State.fillna(0,inplace=True)
   return df_State
 
 def plot_data(df,cat='deathIncrease'):
-  '''Here we are plotting the data we got and cleaned
-     The *args here let us take in optional arguments so we can leave thing in or out
-     For top_10 states, put the top_10 function in for the df, no other argumens
-     For specific cities, put in your df and the city you want as strings, plot_data(df, 'CA', 'MI', 'NJ')
-     To execute from cml python3 -c 'import byStateF; byStateF.plot_data(byStateF.check_state_data(),'CA', 'NY', 'NJ', 'GA'))
-     Doesnt work from CLI prob bceuase of singlen ending double quote'''
   df.groupby(['date', 'state']).sum()[cat].unstack().plot()
   plt.title("# Death increase by State")
   plt.grid(True)
@@ -44,7 +38,8 @@ def plot_data(df,cat='deathIncrease'):
 
     
 def plot_all_data_top_S(df,top=5,d='death'):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.plot_all_data_top_S(byStateF.check_state_data(),5,"deathIncrease"), 'positive')'
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.plot_all_data_top_S(byStateF.check_state_data(),5,"deathIncrease"), "positive")'
+  #get dataframe for the top 5 for deathincrease, then plot the positves
   df.sort_values('date', ascending=False)                              #sort df in decending order
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of most recent date
   rec_sorted = latest_record.sort_values(d, ascending=False)           #sort all death, cummulative death
@@ -53,7 +48,8 @@ def plot_all_data_top_S(df,top=5,d='death'):
   return total_state
 
 def data_top_S_day(df,top=5,cat='death', days=7):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.data_top_S_day(byStateF.check_state_data(),5,"deathIncrease",7))'
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.data_top_S_day(byStateF.check_state_data(),5,"deathIncrease",7),"positive")'
+  #bring in data framen that for the top 5 states with the highest deathIncrease for last seven days, plot this positive cases
   df.sort_values('date', ascending=False)                              #sort df in decending order
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of most recent date
   rec_sorted = latest_record.sort_values(cat, ascending=False)           #sort all death, cummulative death
@@ -63,8 +59,8 @@ def data_top_S_day(df,top=5,cat='death', days=7):
   return total_state
 
 
-def show_top_S(df,top=5,d='death'):
-  #python3 -c 'import byStateF; print(byStateF.show_top_S(byStateF.check_state_data(),5, "deathIncrease"))'
+def data_frame_top_S(df,top=5,d='death'):
+  #python3 -c 'import byStateF; print(byStateF.data_frame_top_S(byStateF.check_state_data(),5, "deathIncrease"))'
   df.sort_values('date', ascending=False)
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of the latest time period, one date
   rec_sorted = latest_record.sort_values(d, ascending=False)     #sort all death on that one day this is a cummulative death
@@ -73,12 +69,10 @@ def show_top_S(df,top=5,d='death'):
   return total_state
 
 def get_states_in_list(df,l=['CA'],days=7):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.get_states_in_list(byStateF.check_state_data(),["FL","CO","MI", "GA"],14))'
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.get_states_in_list(byStateF.check_state_data(),["FL","CO","MI", "GA"],14), "deathIncrease")'
   past_seven_days = df['date'].unique()[0:days]
   df = df[df.date.isin(past_seven_days) & df.state.isin(l)]
   return df
-
-
 
 if __name__ == "__main__":
 
