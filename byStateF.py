@@ -122,4 +122,3 @@ if __name__ == "__main__":
   #plt.title("# Death increase by State")
   #plt.grid(True)
   #plt.show()
-
