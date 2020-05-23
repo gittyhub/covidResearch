@@ -30,26 +30,21 @@ def check_state_data():
   df_State.fillna(0,inplace=True)
   return df_State
 
-def plot_data(df,*args):
+def plot_data(df,cat='deathIncrease'):
   '''Here we are plotting the data we got and cleaned
      The *args here let us take in optional arguments so we can leave thing in or out
      For top_10 states, put the top_10 function in for the df, no other argumens
      For specific cities, put in your df and the city you want as strings, plot_data(df, 'CA', 'MI', 'NJ')
      To execute from cml python3 -c 'import byStateF; byStateF.plot_data(byStateF.check_state_data(),'CA', 'NY', 'NJ', 'GA'))
      Doesnt work from CLI prob bceuase of singlen ending double quote'''
-  s=[]
-  if len(args) > 0:
-    for i in args:
-      s.append(i)
-      df = df[df.state.isin(s)]
-  df.groupby(['date', 'state']).sum()['deathIncrease'].unstack().plot()
+  df.groupby(['date', 'state']).sum()[cat].unstack().plot()
   plt.title("# Death increase by State")
   plt.grid(True)
   plt.show()
 
     
 def plot_all_data_top_S(df,top=5,d='death'):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.plot_top_S(byStateF.check_state_data(),5,"deathIncrease"))'
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.plot_all_data_top_S(byStateF.check_state_data(),5,"deathIncrease"), 'positive')'
   df.sort_values('date', ascending=False)                              #sort df in decending order
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of most recent date
   rec_sorted = latest_record.sort_values(d, ascending=False)           #sort all death, cummulative death
