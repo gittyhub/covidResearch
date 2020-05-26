@@ -66,7 +66,11 @@ def get_states_in_list(df,l=['CA'],days=7):
 
 if __name__ == "__main__":
 
-  plot_data(check_state_data(),"CA", "MI")
+  sf.plot_data(sf.nDF_top_cat(sf.check_state_data(),10,"positiveIncrease"),"positiveIncrease")
+  sf.plot_data(sf.nDF_top_cat_days(sf.check_state_data(),10,"positiveIncrease",14),"positiveIncrease")
+  sf.plot_data(sf.get_states_in_list(sf.check_state_data(),["FL","CO","MI", "GA"],14), "deathIncrease")
+
+
 
   ##----------------------Plot Method #1 
   #ax = plt.gca()
