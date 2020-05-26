@@ -37,8 +37,8 @@ def plot_data(df,cat='deathIncrease'):
   plt.show()
 
     
-def plot_all_data_top_S(df,top=5,d='death'):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.plot_all_data_top_S(byStateF.check_state_data(),5,"deathIncrease"), "positive")'
+def nDF_top_cat(df,top=5,d='death'):
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.nDF_top_cat(byStateF.check_state_data(),5,"deathIncrease"), "positive")'
   #get dataframe for the top 5 for deathincrease, then plot the positves
   df.sort_values('date', ascending=False)                              #sort df in decending order
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of most recent date
@@ -47,8 +47,8 @@ def plot_all_data_top_S(df,top=5,d='death'):
   total_state = df[df.state.isin(top_10_State)]                        #filter df on stop S state
   return total_state
 
-def data_top_S_day(df,top=5,cat='death', days=7):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.data_top_S_day(byStateF.check_state_data(),5,"deathIncrease",7),"positive")'
+def nDF_top_cat_days(df,top=5,cat='death', days=7):
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.nDF_top_cat_days(byStateF.check_state_data(),5,"deathIncrease",7),"positive")'
   #bring in data framen that for the top 5 states with the highest deathIncrease for last seven days, plot this positive cases
   df.sort_values('date', ascending=False)                              #sort df in decending order
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of most recent date
@@ -56,16 +56,6 @@ def data_top_S_day(df,top=5,cat='death', days=7):
   top_10_State = list(rec_sorted['state'][0:top])                        #get top S states with most death in list
   past_seven_days = df['date'].unique()[0:days] 
   total_state = df[df.state.isin(top_10_State) & df.date.isin(past_seven_days)]             #filter df on stop S state
-  return total_state
-
-
-def data_frame_top_S(df,top=5,d='death'):
-  #python3 -c 'import byStateF; print(byStateF.data_frame_top_S(byStateF.check_state_data(),5, "deathIncrease"))'
-  df.sort_values('date', ascending=False)
-  latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of the latest time period, one date
-  rec_sorted = latest_record.sort_values(d, ascending=False)     #sort all death on that one day this is a cummulative death
-  top_10_State = list(rec_sorted['state'][0:top])                        #get top states with most death
-  total_state = rec_sorted[rec_sorted.state.isin(top_10_State)]
   return total_state
 
 def get_states_in_list(df,l=['CA'],days=7):
