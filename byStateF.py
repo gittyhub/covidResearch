@@ -25,20 +25,20 @@ def check_state_data():
   else:
     print('Data Up to Date.')
   df =  pd.DataFrame(pd.read_csv('/home/bot/Documents/daily.csv'))
-  df_State = df[['date','state','positive','death','hospitalized', 'deathIncrease', 'hospitalizedIncrease', 'positiveIncrease']]
+  df_State = df[['date','state','positive','death','hospitalizedCurrently', 'deathIncrease', 'hospitalizedIncrease', 'positiveIncrease']]
   df_State['date'] = pd.to_datetime(df_State['date'], format='%Y%m%d')
   df_State.fillna(0,inplace=True)
   return df_State
 
 def plot_data(df,cat='deathIncrease'):
   df.groupby(['date', 'state']).sum()[cat].unstack().plot()
-  plt.title("# Death increase by State")
+  plt.title("# By "+cat)
   plt.grid(True)
   plt.show()
 
     
 def nDF_top_cat(df,top=5,d='death'):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.nDF_top_cat(byStateF.check_state_data(),5,"deathIncrease"), "positive")'
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.nDF_top_cat(byStateF.check_state_data(),5,"positivehIncrease"), "positive")'
   #get dataframe for the top 5 for deathincrease, then plot the positves
   df.sort_values('date', ascending=False)                              #sort df in decending order
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of most recent date
