@@ -25,7 +25,7 @@ def check_state_data():
   else:
     print('Data Up to Date.')
   df =  pd.DataFrame(pd.read_csv('/home/bot/Documents/daily.csv'))
-  df_State = df[['date','state','positive','death','hospitalizedCurrently', 'deathIncrease', 'hospitalizedIncrease', 'positiveIncrease']]
+  df_State = df[['date','state','death','deathIncrease','hospitalizedIncrease','hospitalizedCurrently','positive', 'positiveIncrease']]
   df_State['date'] = pd.to_datetime(df_State['date'], format='%Y%m%d')
   df_State.fillna(0,inplace=True)
   return df_State
@@ -38,7 +38,7 @@ def plot_data(df,cat='deathIncrease'):
 
     
 def nDF_top_cat(df,top=5,d='death'):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.nDF_top_cat(byStateF.check_state_data(),5,"positivehIncrease"), "positive")'
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.nDF_top_cat(byStateF.check_state_data(),5,"hospitalizedCurrently"), "hospitalizedCurrently")'
   #get dataframe for the top 5 for deathincrease, then plot the positves
   df.sort_values('date', ascending=False)                              #sort df in decending order
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of most recent date
@@ -56,6 +56,15 @@ def nDF_top_cat_days(df,top=5,cat='death', days=7):
   top_10_State = list(rec_sorted['state'][0:top])                        #get top S states with most death in list
   past_seven_days = df['date'].unique()[0:days] 
   total_state = df[df.state.isin(top_10_State) & df.date.isin(past_seven_days)]             #filter df on stop S state
+  return total_state
+
+def show_top_S(df,top=5,d='death'):
+  #python3 -c 'import byStateF; print(byStateF.show_top_S(byStateF.check_state_data(),5, "deathIncrease"))'
+  df.sort_values('date', ascending=False)
+  latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of the latest time period, one date
+  rec_sorted = latest_record.sort_values(d, ascending=False)     #sort all death on that one day this is a cummulative death
+  top_10_State = list(rec_sorted['state'][0:top])                        #get top states with most death
+  total_state = rec_sorted[rec_sorted.state.isin(top_10_State)]
   return total_state
 
 def get_states_in_list(df,l=['CA'],days=7):
