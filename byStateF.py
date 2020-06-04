@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
 import os
+from datetime import timedelta
 
 
 '''This Programs will download current state data on Covid19 and graph it for you'''
@@ -25,7 +26,7 @@ def check_state_data():
   else:
     print('Data Up to Date.')
   df =  pd.DataFrame(pd.read_csv('/home/bot/Documents/daily.csv'))
-  df_State = df[['date','state','death','deathIncrease','hospitalizedIncrease','hospitalizedCurrently','positive', 'positiveIncrease']]
+  df_State = df[['date','state','death','deathIncrease','hospitalizedIncrease','hospitalizedCurrently','hospitalizedCumulative','positive', 'positiveIncrease']]
   df_State['date'] = pd.to_datetime(df_State['date'], format='%Y%m%d')
   df_State.fillna(0,inplace=True)
   return df_State
@@ -68,10 +69,34 @@ def show_top_S(df,top=5,d='death'):
   return total_state
 
 def get_states_in_list(df,l=['CA'],days=7):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.get_states_in_list(byStateF.check_state_data(),["FL","CO","MI", "GA"],14), "deathIncrease")'
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.get_states_in_list(byStateF.check_state_data(),["FL","CO","MI", "GA", "AZ", "AR"],14), "deathIncrease")'
   past_seven_days = df['date'].unique()[0:days]
   df = df[df.date.isin(past_seven_days) & df.state.isin(l)]
   return df
+
+def state_growth_rate(df, cat="positive", b=7):
+  #python3 -c 'import byStateF; print(byStateF.state_growth_rate(byStateF.check_state_data(),"positive",7))'
+  State_current_back_value = []
+  recent_data_date = df.iloc[0,0]                                   #get the current date from the dataframe
+  backward_date = recent_data_date - timedelta(days=b)              #how many days back do you want to go
+  list_of_state = df['state'].unique()                              #get list of all state and create a new df for just the growth rate
+  array_state = {'State':list_of_state, 'Growth':0}                 #create a dic for of state and zero growth for df, will delete Growth later
+  df_state = pd.DataFrame(array_state)                             #create df from the above dic
+  #loop through all states, for the current value and back value for time horizon specified and cat and add to the lis State_current_back_value
+  for i in list_of_state:
+    current_cat_value = int(df.loc[(df['state']==i) & (df['date']==recent_data_date)][cat])
+    backward_cat_value = int(df.loc[(df['state']==i) & (df['date']==backward_date)][cat])
+    State_current_back_value.append([i,current_cat_value, backward_cat_value])
+  df_growth_rate = pd.DataFrame(State_current_back_value, columns=['State', 'Current', 'Back']) #takes list from loop and convert to df
+  inner_df_growth = pd.merge(df_state, df_growth_rate, on='State', how='inner') #join the df_state and the df_growth_rate
+  inner_df_growth[cat+ '+/-'] = inner_df_growth['Current']-inner_df_growth['Back']
+  inner_df_growth[cat+ '%+/-'] = (inner_df_growth['Current']-inner_df_growth['Back'])/inner_df_growth['Back']
+  inner_df_growth['Growth'] = (inner_df_growth['Current']-inner_df_growth['Back'])/b
+  inner_df_growth.index.name =cat
+  #inner_df_growth.sort_values(cat+ '%+/-', ascending=False, inplace=True)
+  inner_df_growth.sort_values('Growth', ascending=False, inplace=True)
+  return inner_df_growth
+
 
 if __name__ == "__main__":
 
