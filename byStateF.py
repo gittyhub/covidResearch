@@ -49,7 +49,7 @@ def nDF_top_cat(df,top=5,d='death'):
   return total_state
 
 def nDF_top_cat_days(df,top=5,cat='death', days=7):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.nDF_top_cat_days(byStateF.check_state_data(),5,"deathIncrease",7),"positive")'
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.nDF_top_cat_days(byStateF.check_state_data(),5,"hospitalizedCurrently",14),"hospitalizedCurrently")'
   #bring in data framen that for the top 5 states with the highest deathIncrease for last seven days, plot this positive cases
   df.sort_values('date', ascending=False)                              #sort df in decending order
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of most recent date
@@ -69,16 +69,17 @@ def show_top_S(df,top=5,d='death'):
   return total_state
 
 def get_states_in_list(df,l=['CA'],days=7):
-  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.get_states_in_list(byStateF.check_state_data(),["FL","CO","MI", "GA", "AZ", "AR"],14), "deathIncrease")'
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.get_states_in_list(byStateF.check_state_data(),["UT","TZ","AR", "OR", "SC", "AZ", "SD"],14), "deathIncrease")'
+  #python3 -c 'import byStateF; byStateF.plot_data(byStateF.get_states_in_list(byStateF.check_state_data(),["UT","TZ","AR", "OR", "SC", "AZ", "SD","OK","VT","MS","NM", "CA"],30), "hospitalizedCurrently")'
   past_seven_days = df['date'].unique()[0:days]
   df = df[df.date.isin(past_seven_days) & df.state.isin(l)]
   return df
 
-def state_growth_rate(df, cat="positive", b=7):
-  #python3 -c 'import byStateF; print(byStateF.state_growth_rate(byStateF.check_state_data(),"positive",7))'
+def state_growth_rate(df, cat="positive", numDays=7, sort='Growth'):
+  #python3 -c 'import byStateF; print(byStateF.state_growth_rate(byStateF.check_state_data(),"positive",7, "positive%+/-"))'
   State_current_back_value = []
   recent_data_date = df.iloc[0,0]                                   #get the current date from the dataframe
-  backward_date = recent_data_date - timedelta(days=b)              #how many days back do you want to go
+  backward_date = recent_data_date - timedelta(days=numDays)              #how many days back do you want to go
   list_of_state = df['state'].unique()                              #get list of all state and create a new df for just the growth rate
   array_state = {'State':list_of_state, 'Growth':0}                 #create a dic for of state and zero growth for df, will delete Growth later
   df_state = pd.DataFrame(array_state)                             #create df from the above dic
@@ -89,12 +90,12 @@ def state_growth_rate(df, cat="positive", b=7):
     State_current_back_value.append([i,current_cat_value, backward_cat_value])
   df_growth_rate = pd.DataFrame(State_current_back_value, columns=['State', 'Current', 'Back']) #takes list from loop and convert to df
   inner_df_growth = pd.merge(df_state, df_growth_rate, on='State', how='inner') #join the df_state and the df_growth_rate
-  inner_df_growth[cat+ '+/-'] = inner_df_growth['Current']-inner_df_growth['Back']
-  inner_df_growth[cat+ '%+/-'] = (inner_df_growth['Current']-inner_df_growth['Back'])/inner_df_growth['Back']
-  inner_df_growth['Growth'] = (inner_df_growth['Current']-inner_df_growth['Back'])/b
+  inner_df_growth[cat+ '+/-'] = inner_df_growth['Current']-inner_df_growth['Back'] #creates column for number of increase in cat
+  inner_df_growth[cat+ '%+/-'] = (inner_df_growth['Current']-inner_df_growth['Back'])/inner_df_growth['Back'] #creates column for percent increase in cat
+  inner_df_growth['Growth'] = (inner_df_growth['Current']-inner_df_growth['Back'])/numDays #gets the slope
   inner_df_growth.index.name =cat
   #inner_df_growth.sort_values(cat+ '%+/-', ascending=False, inplace=True)
-  inner_df_growth.sort_values('Growth', ascending=False, inplace=True)
+  inner_df_growth.sort_values(sort, ascending=False, inplace=True)
   return inner_df_growth
 
 
