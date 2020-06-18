@@ -61,6 +61,7 @@ def nDF_top_cat_days(df,top=5,cat='death', days=7):
 
 def show_top_S(df,top=5,d='death'):
   #python3 -c 'import byStateF; print(byStateF.show_top_S(byStateF.check_state_data(),5, "deathIncrease"))'
+  #python3 -c 'import byStateF; print(byStateF.show_top_S(byStateF.check_state_data(),5, "hospitalizedCurrently"))'
   df.sort_values('date', ascending=False)
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of the latest time period, one date
   rec_sorted = latest_record.sort_values(d, ascending=False)     #sort all death on that one day this is a cummulative death
@@ -77,6 +78,7 @@ def get_states_in_list(df,l=['CA'],days=7):
 
 def state_growth_rate(df, cat="positive", numDays=7, sort='Growth'):
   #python3 -c 'import byStateF; print(byStateF.state_growth_rate(byStateF.check_state_data(),"positive",7, "positive%+/-"))'
+  #python3 -c 'import byStateF; print(byStateF.state_growth_rate(byStateF.check_state_data(),"hospitalizedCurrently",7, "hospitalizedCurrently%+/-"))'
   State_current_back_value = []
   recent_data_date = df.iloc[0,0]                                   #get the current date from the dataframe
   backward_date = recent_data_date - timedelta(days=numDays)              #how many days back do you want to go
