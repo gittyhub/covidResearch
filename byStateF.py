@@ -10,22 +10,22 @@ from datetime import timedelta
 def get_data_State():
   site = 'https://covidtracking.com/api/v1/states/daily.csv'
   df =  pd.DataFrame(pd.read_csv(site, error_bad_lines=False))
-  df.to_csv(r'/home/bot/Documents/daily.csv')
+  df.to_csv(r'/home/hman/Documents/daily.csv')
 
 #code to check the timestamp of the csv file if more than one day old then execute the github function above 
 def check_state_data():
   try:
-    get_file_last_edit = datetime.date.fromtimestamp(os.stat('/home/bot/Documents/daily.csv').st_mtime)
+    get_file_last_edit = datetime.date.fromtimestamp(os.stat('/home/hman/Documents/daily.csv').st_mtime)
   except FileNotFoundError:
     get_file_last_edit = get_data_State()
-    get_file_last_edit = datetime.date.fromtimestamp(os.stat('/home/bot/Documents/daily.csv').st_mtime)
+    get_file_last_edit = datetime.date.fromtimestamp(os.stat('/home/hman/Documents/daily.csv').st_mtime)
   get_today_date = datetime.date.today()
   if get_today_date > get_file_last_edit:
     get_data_State()
     print('Refreshing Data...')
   else:
     print('Data Up to Date.')
-  df =  pd.DataFrame(pd.read_csv('/home/bot/Documents/daily.csv'))
+  df =  pd.DataFrame(pd.read_csv('/home/hman/Documents/daily.csv'))
   df_State = df[['date','state','death','deathIncrease','hospitalizedIncrease','hospitalizedCurrently','hospitalizedCumulative','positive', 'positiveIncrease']]
   df_State['date'] = pd.to_datetime(df_State['date'], format='%Y%m%d')
   df_State.fillna(0,inplace=True)
@@ -40,7 +40,7 @@ def plot_data(df,cat='deathIncrease'):
     
 def nDF_top_cat(df,top=5,d='death'):
   #python3 -c 'import byStateF; byStateF.plot_data(byStateF.nDF_top_cat(byStateF.check_state_data(),5,"hospitalizedCurrently"), "hospitalizedCurrently")'
-  #get dataframe for the top 5 for deathincrease, then plot the positves
+  #get dataframe for the top 5 for hosptializedCurrently, then plot the hospitalizedCurrently
   df.sort_values('date', ascending=False)                              #sort df in decending order
   latest_record = df[df['date'] == df['date'].iloc[0]]                 #gets all deaths as of most recent date
   rec_sorted = latest_record.sort_values(d, ascending=False)           #sort all death, cummulative death
@@ -103,10 +103,10 @@ def state_growth_rate(df, cat="positive", numDays=7, sort='Growth'):
 
 if __name__ == "__main__":
 
-  sf.plot_data(sf.nDF_top_cat(sf.check_state_data(),10,"positiveIncrease"),"positiveIncrease")
-  sf.plot_data(sf.nDF_top_cat_days(sf.check_state_data(),10,"positiveIncrease",14),"positiveIncrease")
-  sf.plot_data(sf.get_states_in_list(sf.check_state_data(),["FL","CO","MI", "GA"],14), "deathIncrease")
-
+  #sf.plot_data(sf.nDF_top_cat(sf.check_state_data(),10,"positiveIncrease"),"positiveIncrease")
+  #sf.plot_data(sf.nDF_top_cat_days(sf.check_state_data(),10,"positiveIncrease",14),"positiveIncrease")
+  #sf.plot_data(sf.get_states_in_list(sf.check_state_data(),["FL","CO","MI", "GA"],14), "deathIncrease")
+  print(show_top_S(check_state_data(),5, "deathIncrease"))
 
 
   ##----------------------Plot Method #1 
